@@ -1,4 +1,2 @@
 Todo:
 - deal with an image
-- block invalid inputs from genorating a file
-- Host webpage

@@ -1,8 +1,16 @@
 document.getElementById("submitButton").addEventListener("click", function () {
+  try {
   const rawData = document.getElementById("userInput").value;
   const ics_events = genorateEvents(rawData);
+  if (ics_events === "") {
+    alert("No valid course data found. Please check your input.");
+    return;
+  }
   const ics_file = wrapEvents(ics_events);
   genorateDownloadLink(ics_file);
+  } catch (error) {
+    alert("An error occured! Check your input and try again.");
+  }
 });
 
 function genorateEvents(rawData) {
