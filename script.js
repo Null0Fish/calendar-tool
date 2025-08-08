@@ -159,7 +159,6 @@ function wrapEvents(events) {
   PRODID:-//CalendarGenerator//EN
   CALSCALE:GREGORIAN
   ${events}
-
   END:VCALENDAR`;
   var lines = wrapped_events.split('\n');
   var cleaned_content = '';
