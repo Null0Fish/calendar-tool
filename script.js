@@ -10,7 +10,7 @@ document.getElementById("submitButton").addEventListener("click", function () {
   genorateDownloadLink(ics_file);
   } catch (error) {
     alert("An error occured! Check your input and try again.");
-  }
+  }dddd
 });
 
 function genorateEvents(rawData) {
