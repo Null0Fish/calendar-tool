@@ -1,0 +1,5 @@
+Todo:
+- Issues with TBA type
+- Must parse whole page not jsut one class
+- Must convert parsed data to ics
+- There may be issues if locations or instructors have 'pm' or 'am' in them
