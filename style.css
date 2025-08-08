@@ -1,49 +1,85 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
 }
-
-.container {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.banner {
+    background: #c62828;
+    color: #fff;
+    padding: 20px 0;
     text-align: center;
-    width: 80%;
-    max-width: 600px;
+    font-size: 2em;
+    letter-spacing: 2px;
 }
-
-textarea {
-  display: block;
-  margin: 1rem auto;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    background: #ffffff; /* white */
+    max-width: 900px;
+    margin: 40px auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 40px;
+    align-items: center;
 }
-
-
+.main-image {
+    width: 100%;
+    max-width: 250px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.content-section h1 {
+    margin-top: 0;
+    color: #333;
+}
+.content-section p {
+    color: #555;
+    line-height: 1.6;
+}
+.subsection {
+    margin-top: 24px;
+}
+.subsection h2 {
+    margin-bottom: 8px;
+    color: #c62828;
+    font-size: 1.2em;
+}
+.credits {
+    text-align: center;
+    margin: 30px 0 10px 0;
+    color: #777;
+    font-size: 0.95em;
+}
+textarea, button {
+    margin-top: 16px;
+    width: 100%;
+    font-size: 1em;
+}
 button {
-    padding: 0.5rem 1.2rem;
-    font-size: 1rem;
-    background-color: #3498db;
-    color: white;
+    background: #c62828;
+    color: #fff;
     border: none;
+    padding: 10px 0;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
 }
-
 button:hover {
-    background-color: #2980b9;
+    background: #8e0000;
 }
 
-#output {
-    margin-top: 1rem;
-    font-style: italic;
+a {
+    color: #444444;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s, text-decoration 0.2s;
+}
+a:hover, a:focus {
+    color: #222222;
+    text-decoration: underline;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
 }

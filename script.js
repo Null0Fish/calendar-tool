@@ -2,8 +2,7 @@ document.getElementById("submitButton").addEventListener("click", function () {
   const rawData = document.getElementById("userInput").value;
   const ics_events = genorateEvents(rawData);
   const ics_file = wrapEvents(ics_events);
-  console.log(ics_file);
-  // genorateDownloadLink(ics_file);
+  genorateDownloadLink(ics_file);
 });
 
 function genorateEvents(rawData) {

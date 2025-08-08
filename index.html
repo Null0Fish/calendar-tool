@@ -1,20 +1,54 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calendar Tool</title>
+  <title>MySchedule+</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Paste Your Raw Schedule Below</h1>
-    <textarea id="userInput" placeholder="Paste here..." rows="5" cols="50"></textarea>
-    <br/>
-    <button id="submitButton">Genorate</button>
-    <p id="output"></p>
+  <div class="banner">
+    MySchedule+
   </div>
-
+  <div class="main-grid">
+    <img src="calendar.png" alt="Calendar Illustration" class="main-image"/>
+    <div class="content-section">
+      <h1>Northeastern's Course Schedule is Bad</h1>
+      <p>
+        Currently, to view your class schedule you must navigatte there from the Student Hub which is inconvient. Furthermore, the schedule is hard to read and provides no easy form of integration with any calendar or orgizational tool.
+      </p>
+      <div class="subsection">
+        <h2>How MySchedule+ Helps</h2>
+        <p>
+          icalendar (.ics) is a univerisal calendar file format that can be imported to a prexisitng calendar of your choice. Copy and paste your entire schedule into the box below to genorate your own .ics file.
+        </p>
+      </div>
+      <div class="subsection">
+        <h2>How to Import an iCalendar File</h2>
+        <ul>
+          <li><a href="https://superuser.com/questions/1679733/import-event-from-ics-into-outlook">Outlook Calendar</a></a></li>
+          <li><a href="https://support.google.com/calendar/answer/37118?hl=en&co=GENIE.Platform%3DDesktop">Google calendar</a></li>
+          <li><a href="https://support.apple.com/en-gb/guide/calendar/icl1023/mac">Apple calendar</a></li>
+        </ul>
+      </div>
+      <div class="subsection">
+        <h2>Using MySchedule+</h2>
+        <p>
+          Go to <a href="https://student.me.northeastern.edu/resources/">Student Hub</a> > Course Registration and select the deesired term and then copy it with one of the methods below. Then paste your raw schedule in the input feild below and click genorate to download your iCalendar file.
+          <ul>
+            <li>Manualy select the page</li>
+            <li>Ctrl + A on Windows</li>
+            <li>Cmd + A on Mac</li>
+          </ul>
+        </p>
+        <textarea id="userInput" placeholder="Paste here..." rows="5" cols="50"></textarea>
+        <button id="submitButton">Generate</button>
+      </div>
+    </div>
+  </div>
+  <div class="credits">
+    Made by Jackson :D
+  </div>
   <script src="script.js"></script>
 </body>
-</html>

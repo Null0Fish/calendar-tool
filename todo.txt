@@ -1,5 +1,4 @@
 Todo:
-- asses any potential other input bugs
-- Add links to how to use .ics with other calanders
-- Redesign page
+- deal with an image
+- block invalid inputs from genorating a file
 - Host webpage
