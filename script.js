@@ -76,7 +76,10 @@ function genorateEvent(rawData, title_line, instructor_line) {
     }
   }
   const location = rawData.substring(0, firstMonthIndex).trim();
-  const classDates = rawData.substring(firstMonthIndex, rawData.lastIndexOf('2025') + 4).split(' - ');
+  const current_year_index = rawData.lastIndexOf(new Date().getFullYear());
+  const next_year_index = rawData.indexOf(new Date().getFullYear() + 1);
+  const final_year_index = Math.max(current_year_index, next_year_index);
+  const classDates = rawData.substring(firstMonthIndex, final_year_index + 4).split(' - ');
   const startDate = classDates[0].trim();
   const endDate = classDates[1].trim();
   const startTime = classTimes[0].trim();
