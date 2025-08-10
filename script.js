@@ -1,10 +1,11 @@
 document.getElementById("submitButton").addEventListener("click", function () {
+  // Evrything goes in a try catch block because I am lazy and will not do any proper error handeling
   try {
-  const rawData = document.getElementById("userInput").value;
-  const ics_events = genorateEvents(rawData);
-  if (ics_events === "") {
-    alert("No valid course data found. Please check your input.");
-    return;
+    const rawData = document.getElementById("userInput").value;
+    const ics_events = genorateEvents(rawData);
+    if (ics_events === "") {
+      alert("No valid course data found. Please check your input.");
+      return;
   }
   const ics_file = wrapEvents(ics_events);
   genorateDownloadLink(ics_file);
@@ -148,14 +149,19 @@ function formatDate(date, time, UTC) {
   if (UTC) {
     h = (h + 5) % 24
   }
-  if (meridian.toLowerCase() === 'pm' && h !== 12) h += 12;
-  if (meridian.toLowerCase() === 'am' && h === 12) h = 0;
+  if (meridian.toLowerCase() === 'pm' && h !== 12) {
+    h += 12;
+  }
+  if (meridian.toLowerCase() === 'am' && h === 12) {
+    h = 0;
+  }
   const formattedTime = `${String(h).padStart(2, '0')}${minute}00`;
 
   return `${formattedDate}T${formattedTime}`;
 }
 
 function wrapEvents(events) {
+  // Wraper includes my bierthday because why not
   var wrapped_events = `
   BEGIN:VCALENDAR
   VERSION:2.0
@@ -171,10 +177,14 @@ function wrapEvents(events) {
   DESCRIPTION:My Birthday!
   END:VEVENT
   END:VCALENDAR`;
+  // Cleans up the resulting ics file to ensure it can be accurtly parsed
   var lines = wrapped_events.split('\n');
   var cleaned_content = '';
   for (var line of lines) {
-    cleaned_content += line.trim() + '\n';
+    line = line.trim();
+    if (line !== '') {
+      cleaned_content += line + '\r\n';
+    }
   }
   return cleaned_content
 }
