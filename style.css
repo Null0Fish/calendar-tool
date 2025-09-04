@@ -15,7 +15,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 2fr;
     gap: 30px;
-    background: #ffffff; /* white */
+    background: #ffffff;
     max-width: 900px;
     margin: 40px auto;
     border-radius: 12px;
