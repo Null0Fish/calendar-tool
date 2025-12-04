@@ -168,14 +168,6 @@ function wrapEvents(events) {
   PRODID:-//CalendarGenerator//EN
   CALSCALE:GREGORIAN
   ${events}
-  BEGIN:VEVENT
-  UID:yaybirthday@northeastern.com
-  DTSTAMP:20250228T000000Z
-  DTSTART;VALUE=DATE:20250228
-  RRULE:FREQ=YEARLY
-  SUMMARY:Jackson's Birthday
-  DESCRIPTION:My Birthday!
-  END:VEVENT
   END:VCALENDAR`;
   // Cleans up the resulting ics file to ensure it can be accurtly parsed
   var lines = wrapped_events.split('\n');
