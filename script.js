@@ -11,15 +11,18 @@ document.getElementById("submitButton").addEventListener("click", function () {
   genorateDownloadLink(ics_file);
   } catch (error) {
     alert("An error occured! Check your input and try again.");
+    console.error(error)
   }
 });
 
 function genorateEvents(rawData) {
   const CHUNK_LENGTH = 13
+  const WAITLIST_CHUNK_LENGTH = 15;
   const TITLE_LINE = 0;
   const INSTRUCTOR_LINE = 4;
   const START_LINE_OFFSET = 2;
   const DATA_TABLE_LINE = 11;
+  const STATUS_LINE = 3;
   var lines = rawData.split('\n');
   var parsingData = true
   var events = "";
@@ -39,12 +42,25 @@ function genorateEvents(rawData) {
     }
     // Cut off any prior data
     lines.splice(0, start_index);
-    if (lines[DATA_TABLE_LINE].indexOf("TBA") == -1) {
-      const event = genorateEvent(lines[DATA_TABLE_LINE], lines[TITLE_LINE], lines[INSTRUCTOR_LINE]);
-      const icsContent = formatEvent(event);
-      events += icsContent;
+    console.log(lines[STATUS_LINE])
+
+    var waitlist_class = lines[STATUS_LINE].indexOf("Waitlist") != -1
+    var async_class = lines[DATA_TABLE_LINE].indexOf("TBA") != -1
+
+    if (waitlist_class) {
+      console.log('skipped waitlist');
+      lines = lines.splice(0 + WAITLIST_CHUNK_LENGTH - 1);
+      continue;
     }
-    // Remove the processed data chunk
+    if (async_class) {
+      lines = lines.splice(0 + CHUNK_LENGTH - 1);
+      continue;
+    }
+
+    const event = genorateEvent(lines[DATA_TABLE_LINE], lines[TITLE_LINE], lines[INSTRUCTOR_LINE]);
+    const icsContent = formatEvent(event);
+    events += icsContent;
+
     lines = lines.splice(0 + CHUNK_LENGTH - 1);
   }
   return events;
