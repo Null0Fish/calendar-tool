@@ -16,102 +16,96 @@ document.getElementById("submitButton").addEventListener("click", function () {
 });
 
 function genorateEvents(rawData) {
-  const CHUNK_LENGTH = 13
-  const WAITLIST_CHUNK_LENGTH = 15;
-  const TITLE_LINE = 0;
-  const INSTRUCTOR_LINE = 4;
-  const START_LINE_OFFSET = 2;
-  const DATA_TABLE_LINE = 11;
-  const STATUS_LINE = 3;
-  var lines = rawData.split('\n');
-  var parsingData = true
-  var events = "";
-  while (parsingData) {
-    var start_index = -1;
-    for (var i = 0; i < lines.length; i++) {
-      // A course data chunk has been located
-      if (lines[i].indexOf('CRN') !== -1) {
-        start_index = i - START_LINE_OFFSET;
-        break;
-      } 
-    }
-    if (start_index == -1) {
-      // No more course data chunks found
-        parsingData = false;
-        break;
-    }
-    // Cut off any prior data
-    lines.splice(0, start_index);
-    console.log(lines[STATUS_LINE])
+  const lines = rawData.split('\n');
+  const events = [];
+  let currentBlock = [];
 
-    var waitlist_class = lines[STATUS_LINE].indexOf("Waitlist") != -1
-    var async_class = lines[DATA_TABLE_LINE].indexOf("TBA") != -1
-
-    if (waitlist_class) {
-      console.log('skipped waitlist');
-      lines = lines.splice(0 + WAITLIST_CHUNK_LENGTH - 1);
-      continue;
-    }
-    if (async_class) {
-      lines = lines.splice(0 + CHUNK_LENGTH - 1);
+  for (const line of lines) {
+    if (line.trim() === '' && currentBlock.length === 0) {
       continue;
     }
 
-    const event = genorateEvent(lines[DATA_TABLE_LINE], lines[TITLE_LINE], lines[INSTRUCTOR_LINE]);
-    const icsContent = formatEvent(event);
-    events += icsContent;
+    currentBlock.push(line);
 
-    lines = lines.splice(0 + CHUNK_LENGTH - 1);
+    if (line.includes('CRN:')) {
+      const event = parseScheduleBlock(currentBlock.join('\n'));
+      if (event) {
+        events.push(formatEvent(event));
+      }
+      currentBlock = [];
+    }
   }
-  return events;
+
+  return events.join('');
 }
 
-function genorateEvent(rawData, title_line, instructor_line) {
-  const LAST_TIME_DELTA = 6
-  const MONTHS = [
-    'Jan', 'Feb', 'Mar', 'Apr', 
-    'May', 'Jun', 'Jul', 'Aug', 
-    'Sep', 'Oct', 'Nov', 'Dec'
-  ];
-  const firstDigitIndex = rawData.indexOf(rawData.match(/\d/));
-  const lastTimeIndex = rawData.lastIndexOf(":") + LAST_TIME_DELTA;
-  const classTimes = rawData.substring(firstDigitIndex, lastTimeIndex).split(' - ');
-  const classDays = rawData.match(/[MTWRF]+/g);
-  var instructor = instructor_line
-  if (instructor.indexOf('E-mail') !== -1) {
-    instructor = instructor.substring(0, instructor.indexOf('E-mail')).trim();
+function parseScheduleBlock(blockText) {
+  const titleLine = blockText.split('\n').find(line => line.includes('](') && line.includes('Class Begin:')) || '';
+  const titleMatch = titleLine.match(/^\[([^\]]+)\]/);
+  const title = titleMatch ? titleMatch[1].trim() : titleLine.trim();
+
+  const waitlistMatch = blockText.match(/Waitlist Position:\s*(\d+)/i);
+  if (waitlistMatch && parseInt(waitlistMatch[1], 10) > 0) {
+    return null;
   }
-  if (instructor.indexOf(':') !== -1) {
-    instructor = instructor.substring(instructor.indexOf(':') + 1).trim();
+
+  const timeLine = blockText.split('\n').find(line => line.includes('Type: Class') && line.includes(' - ')) || '';
+  if (timeLine.includes('TBA')) {
+    return null;
   }
-  rawData = rawData.substring(lastTimeIndex + classDays[0].length + 1).trim();
-  var firstMonthIndex = 99999;
-  for (var month of MONTHS) {
-    var monthIndex = rawData.indexOf(month);
-    if (monthIndex !== -1 && monthIndex < firstMonthIndex) {
-        firstMonthIndex = monthIndex;
+
+  const scheduleLine = blockText.split('\n').find(line => line.includes('--') && /Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday/.test(line)) || '';
+  const scheduleMatch = scheduleLine.match(/([0-9]{2}\/\d{2}\/\d{4})\s*--\s*([0-9]{2}\/\d{2}\/\d{4})\s+(.+)$/);
+  if (!scheduleMatch) {
+    return null;
+  }
+
+  const timeMatch = timeLine.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)/i);
+  if (!timeMatch) {
+    return null;
+  }
+
+  const locationMatch = timeLine.match(/Location:\s*(.+)$/i);
+  const location = locationMatch ? locationMatch[1].trim() : '';
+
+  const instructorLine = blockText.split('\n').find(line => line.startsWith('Instructor:')) || '';
+  const instructor = instructorLine
+    .replace(/^Instructor:\s*/i, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\s*\([^)]+\)\s*$/g, '')
+    .trim();
+
+  const dayMap = {
+    monday: 'M',
+    tuesday: 'T',
+    wednesday: 'W',
+    thursday: 'R',
+    friday: 'F',
+    saturday: 'S',
+    sunday: 'U'
+  };
+  const days = scheduleMatch[3]
+    .split(',')
+    .map(day => dayMap[day.trim().toLowerCase()])
+    .filter(Boolean);
+
+  if (days.length === 0) {
+    const legacyDayMatch = blockText.match(/[MTWRFSU]+/g);
+    if (legacyDayMatch) {
+      days.push(...legacyDayMatch[0].split(''));
     }
   }
-  const location = rawData.substring(0, firstMonthIndex).trim();
-  const current_year_index = rawData.lastIndexOf(new Date().getFullYear());
-  const next_year_index = rawData.indexOf(new Date().getFullYear() + 1);
-  const final_year_index = Math.max(current_year_index, next_year_index);
-  const classDates = rawData.substring(firstMonthIndex, final_year_index + 4).split(' - ');
-  const startDate = classDates[0].trim();
-  const endDate = classDates[1].trim();
-  const startTime = classTimes[0].trim();
-  const endTime = classTimes[1].trim();
-  const event = {
-    title: title_line,
-    startTime: startTime,
-    endTime: endTime,
-    days: classDays[0].split(''),
+
+  return {
+    title: title,
+    startTime: timeMatch[1].trim(),
+    endTime: timeMatch[2].trim(),
+    days: days,
     location: location,
-    startDate: startDate,
-    endDate: endDate,
+    startDate: scheduleMatch[1].trim(),
+    endDate: scheduleMatch[2].trim(),
     instructor: instructor
   };
-  return event;
 }
 
 function formatEvent(event) {
@@ -148,15 +142,28 @@ function formatEvent(event) {
 }
 
 function formatDate(date, time, UTC) {
-  const monthMap = {
-    Jan: '01', Feb: '02', Mar: '03', Apr: '04',
-    May: '05', Jun: '06', Jul: '07', Aug: '08',
-    Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-  };
+  let year;
+  let month;
+  let day;
 
-  const [monthStr, dayWithComma, year] = date.split(' ');
-  const day = dayWithComma.replace(',', '').padStart(2, '0');
-  const month = monthMap[monthStr];
+  if (date.includes('/')) {
+    const dateParts = date.split('/');
+    month = dateParts[0].padStart(2, '0');
+    day = dateParts[1].padStart(2, '0');
+    year = dateParts[2];
+  } else {
+    const monthMap = {
+      Jan: '01', Feb: '02', Mar: '03', Apr: '04',
+      May: '05', Jun: '06', Jul: '07', Aug: '08',
+      Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+    };
+
+    const [monthStr, dayWithComma, parsedYear] = date.split(' ');
+    day = dayWithComma.replace(',', '').padStart(2, '0');
+    month = monthMap[monthStr];
+    year = parsedYear;
+  }
+
   const formattedDate = `${year}${month}${day}`;
 
   const [hour, minutePart] = time.split(':');
